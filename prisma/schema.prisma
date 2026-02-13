@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  password  String?
+  image     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+  orders    Order[]
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  coverImage   String?
+  status       String   @default("draft")
+  theme        String   @default("quiet-luxe")
+  colorPalette String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  pages        Page[]
+  photos       Photo[]
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Page {
+  id        String  @id @default(cuid())
+  type      String
+  order     Int
+  content   String?
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  width     Int?
+  height    Int?
+  theme     String?
+  emotion   String?
+  colors    String?
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  status    String   @default("pending")
+  amount    Float
+  currency  String   @default("USD")
+  plan      String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Template {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  thumbnail   String?
+  config      String
+}
