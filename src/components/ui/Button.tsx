@@ -1,39 +1,44 @@
-"use client";
-import { clsx } from "clsx";
-import { ButtonHTMLAttributes, forwardRef } from "react";
+import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { clsx } from 'clsx';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "outline";
-  size?: "sm" | "md" | "lg";
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  children: ReactNode;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", children, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={clsx(
-          "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
-          {
-            "bg-[#2C2825] text-[#F5F0EB] hover:bg-[#3d3632] focus:ring-[#2C2825]": variant === "primary",
-            "bg-[#F5F0EB] text-[#2C2825] hover:bg-[#E8E3DE] focus:ring-[#8A8279]": variant === "secondary",
-            "bg-transparent text-[#2C2825] hover:bg-[#F5F0EB] focus:ring-[#8A8279]": variant === "ghost",
-            "border-2 border-[#2C2825] text-[#2C2825] hover:bg-[#2C2825] hover:text-[#F5F0EB] focus:ring-[#2C2825]": variant === "outline",
-          },
-          {
-            "px-3 py-1.5 text-sm": size === "sm",
-            "px-5 py-2.5 text-base": size === "md",
-            "px-8 py-3.5 text-lg": size === "lg",
-          },
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
-);
+export default function Button({ 
+  variant = 'primary', 
+  size = 'md', 
+  children, 
+  className,
+  ...props 
+}: ButtonProps) {
+  const baseStyles = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+  
+  const variants = {
+    primary: "bg-gradient-to-r from-[#1A1612] to-[#2C2825] text-white hover:shadow-lg hover:scale-105 active:scale-100",
+    secondary: "bg-white text-[#1A1612] border-2 border-white hover:bg-[#FAFAF8] hover:shadow-lg hover:scale-105 active:scale-100",
+    outline: "bg-transparent text-[#1A1612] border-2 border-[#EBE6DD] hover:border-[#C9A870] hover:bg-[#FAFAF8]",
+  };
+  
+  const sizes = {
+    sm: "px-4 py-2 text-sm",
+    md: "px-6 py-3 text-base",
+    lg: "px-8 py-4 text-lg",
+  };
 
-Button.displayName = "Button";
-export default Button;
+  return (
+    <button
+      className={clsx(
+        baseStyles,
+        variants[variant],
+        sizes[size],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
