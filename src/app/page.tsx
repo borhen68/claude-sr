@@ -1,201 +1,136 @@
 "use client";
-import { motion } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 
-const features = [
-  {
-    icon: "🤖",
-    title: "AI Design Director",
-    description: "Our AI analyzes your photos — detecting themes, emotions, and colors — then crafts a cohesive design that tells your story.",
-  },
-  {
-    icon: "📖",
-    title: "Smart Layouts",
-    description: "Automatic page layouts that follow editorial design principles. Hero spreads, grids, collages, and quote pages — perfectly balanced.",
-  },
-  {
-    icon: "✏️",
-    title: "Visual Editor",
-    description: "Drag, drop, resize, and rearrange. Full control over every page with an intuitive editor that feels like magic.",
-  },
-  {
-    icon: "🖨️",
-    title: "Print-Ready Quality",
-    description: "300 DPI, CMYK color, proper bleeds and margins. Your book arrives looking exactly like the preview — or better.",
-  },
-  {
-    icon: "🎨",
-    title: "Premium Templates",
-    description: "Curated design themes from minimal elegance to bold storytelling. Each template is a complete design system.",
-  },
-  {
-    icon: "📦",
-    title: "Delivered to Your Door",
-    description: "Premium printing on uncoated silk paper with soft-touch covers. Shipped worldwide in protective packaging.",
-  },
-];
-
-const testimonials = [
-  {
-    quote: "I uploaded 200 wedding photos and had a stunning book in 10 minutes. The AI understood the story better than I could have arranged it myself.",
-    author: "Sarah M.",
-    role: "Wedding Client",
-  },
-  {
-    quote: "As a photographer, I've tried every photo book service. Frametale is the first one that actually produces design-quality layouts automatically.",
-    author: "James K.",
-    role: "Professional Photographer",
-  },
-  {
-    quote: "The print quality is exceptional. Soft-touch cover, beautiful paper stock. My family thought I hired a designer.",
-    author: "Priya R.",
-    role: "Family Book",
-  },
-];
-
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-[#FAFAF8]">
       <Navbar />
 
-      {/* Hero */}
+      {/* Hero - No animations, just clarity */}
       <section className="pt-32 pb-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-[#8A8279] text-sm tracking-[0.2em] uppercase mb-6"
-          >
-            AI-Powered Photo Books
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-serif font-light leading-tight mb-8"
-          >
-            Your memories,
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-serif font-light leading-tight mb-6 text-[#1A1612]">
+            Your photos deserve
             <br />
-            <span className="italic">beautifully told</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg text-[#8A8279] max-w-2xl mx-auto mb-10 leading-relaxed"
-          >
-            Upload your photos. Our AI analyzes every image — detecting emotions, themes, and colors —
-            then designs a stunning photo book you&apos;ll treasure forever.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
+            better than a folder.
+          </h1>
+          <p className="text-xl text-[#534C43] max-w-2xl mb-10 leading-relaxed">
+            Upload your photos. We'll sort them, pick the best ones, and turn them into 
+            a book you'll actually want on your coffee table.
+          </p>
+          <div className="flex gap-4">
             <Link href="/projects/new">
-              <Button size="lg">Create Your Book</Button>
+              <Button size="lg">Start Your Book</Button>
             </Link>
             <Link href="/pricing">
-              <Button variant="outline" size="lg">View Pricing</Button>
+              <Button variant="outline" size="lg">See Pricing</Button>
             </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Preview mockup */}
-      <section className="pb-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border border-[#E8E3DE]">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-xl bg-gradient-to-br from-[#E8E3DE] to-[#D4CEC7] flex items-center justify-center text-[#8A8279]"
-                >
-                  <svg className="w-8 h-8 opacity-40" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-                  </svg>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 text-center text-[#8A8279] text-sm">
-              ↑ Your photos will appear here — AI arranges them into perfect layouts
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
+      {/* How it works - Simple, honest */}
       <section className="py-20 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#8A8279] text-sm tracking-[0.2em] uppercase mb-4">How It Works</p>
-            <h2 className="text-4xl font-serif font-light">Design intelligence meets your memories</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((f, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="p-8 rounded-2xl hover:bg-[#F5F0EB] transition-colors duration-300"
-              >
-                <div className="text-3xl mb-4">{f.icon}</div>
-                <h3 className="text-lg font-medium mb-2 font-sans">{f.title}</h3>
-                <p className="text-[#8A8279] text-sm leading-relaxed">{f.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#8A8279] text-sm tracking-[0.2em] uppercase mb-4">Testimonials</p>
-            <h2 className="text-4xl font-serif font-light">Loved by thousands</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white p-8 rounded-2xl border border-[#E8E3DE]"
-              >
-                <p className="text-[#2C2825] leading-relaxed mb-6 italic font-serif text-sm">&ldquo;{t.quote}&rdquo;</p>
-                <div>
-                  <p className="font-medium text-sm">{t.author}</p>
-                  <p className="text-[#8A8279] text-xs">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-6 bg-[#2C2825]">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-serif font-light text-[#F5F0EB] mb-6">
-            Ready to tell your story?
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-serif font-light mb-16 text-center">
+            Three steps. No design degree required.
           </h2>
-          <p className="text-[#8A8279] mb-10 leading-relaxed">
-            Upload your photos and let AI create something beautiful. Your first book preview is free.
+          
+          <div className="grid md:grid-cols-3 gap-12">
+            <div>
+              <div className="text-4xl font-serif text-[#C9A870] mb-4">1</div>
+              <h3 className="text-xl font-medium mb-3">Upload</h3>
+              <p className="text-[#534C43] leading-relaxed">
+                Drop in 20-100 photos. We'll handle the rest.
+              </p>
+            </div>
+            
+            <div>
+              <div className="text-4xl font-serif text-[#C9A870] mb-4">2</div>
+              <h3 className="text-xl font-medium mb-3">Review</h3>
+              <p className="text-[#534C43] leading-relaxed">
+                We organize your photos into a beautiful layout. 
+                Tweak it if you want, or leave it as-is.
+              </p>
+            </div>
+            
+            <div>
+              <div className="text-4xl font-serif text-[#C9A870] mb-4">3</div>
+              <h3 className="text-xl font-medium mb-3">Receive</h3>
+              <p className="text-[#534C43] leading-relaxed">
+                Your book arrives in 7-10 days. Premium paper, 
+                professional binding.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What makes it good - Features without buzzwords */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-serif font-light mb-12">
+            What makes this different
+          </h2>
+          
+          <div className="space-y-8">
+            <div className="flex gap-6">
+              <div className="w-2 h-2 rounded-full bg-[#C9A870] mt-2 flex-shrink-0"></div>
+              <div>
+                <h3 className="text-lg font-medium mb-2">We pick the good photos</h3>
+                <p className="text-[#534C43]">
+                  Our system finds faces, checks for blur, and removes duplicates. 
+                  You don't have to sort through 300 iPhone photos.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-6">
+              <div className="w-2 h-2 rounded-full bg-[#C9A870] mt-2 flex-shrink-0"></div>
+              <div>
+                <h3 className="text-lg font-medium mb-2">Actually good design</h3>
+                <p className="text-[#534C43]">
+                  No clipart. No Comic Sans. Just clean layouts that look like 
+                  a real designer made them.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-6">
+              <div className="w-2 h-2 rounded-full bg-[#C9A870] mt-2 flex-shrink-0"></div>
+              <div>
+                <h3 className="text-lg font-medium mb-2">Print quality that matters</h3>
+                <p className="text-[#534C43]">
+                  300 DPI on thick matte paper. Hardcover binding. 
+                  The colors actually match your screen.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing - Clear, no games */}
+      <section className="py-20 px-6 bg-[#1A1612] text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-serif font-light mb-6">
+            One price. No surprises.
+          </h2>
+          <div className="text-5xl font-serif mb-4">$39</div>
+          <p className="text-[#EBE6DD] mb-8">
+            20-page hardcover book, shipped to your door
           </p>
           <Link href="/projects/new">
-            <Button variant="secondary" size="lg">Start Creating — It&apos;s Free</Button>
+            <Button variant="secondary" size="lg">
+              Start Your Book
+            </Button>
           </Link>
+          <p className="text-sm text-[#8A8279] mt-6">
+            Preview is free. Only pay when you order.
+          </p>
         </div>
       </section>
 
