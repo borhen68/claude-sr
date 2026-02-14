@@ -1,9 +1,10 @@
 /**
- * Smart Photo Analyzer
- * Zero AI cost - uses free libraries
+ * Smart Photo Analyzer (WITHOUT node-vibrant)
+ * Zero AI cost - uses only sharp + exifr
  */
 
 import sharp from 'sharp';
+import exifr from 'exifr';
 
 export interface PhotoAnalysis {
   id: string;
@@ -27,7 +28,7 @@ export interface PhotoAnalysis {
 }
 
 /**
- * Analyze a single photo (simplified - works without external deps)
+ * Analyze a single photo
  */
 export async function analyzePhoto(
   buffer: Buffer,
@@ -37,10 +38,19 @@ export async function analyzePhoto(
     // Get image metadata
     const metadata = await sharp(buffer).metadata();
     
-    // Get basic stats
+    // Extract EXIF data
+    let exifData;
+    try {
+      exifData = await exifr.parse(buffer);
+    } catch (e) {
+      exifData = null;
+    }
+    
+    // Get basic stats for color/quality
     const stats = await sharp(buffer)
-      .greyscale()
-      .stats();
+      .resize(100, 100, { fit: 'cover' })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
     
     const { width = 0, height = 0 } = metadata;
     const aspectRatio = width / height;
@@ -51,16 +61,12 @@ export async function analyzePhoto(
     else if (aspectRatio < 0.9) orientation = 'portrait';
     else orientation = 'square';
     
-    // Calculate quality metrics
-    const brightness = (stats.channels[0].mean / 255) * 100;
-    const sharpness = Math.min(100, brightness * 1.2); // Simplified
+    // Extract dominant color from pixel data
+    const dominant = extractDominantColor(stats.data);
     
-    // Extract dominant color from stats
-    const dominant = rgbToHex(
-      Math.floor(stats.channels[0].mean),
-      Math.floor(stats.channels[1]?.mean || stats.channels[0].mean),
-      Math.floor(stats.channels[2]?.mean || stats.channels[0].mean)
-    );
+    // Calculate quality metrics
+    const brightness = calculateBrightness(stats.data);
+    const sharpness = Math.min(100, brightness * 1.2);
     
     return {
       id: generateId(),
@@ -68,7 +74,7 @@ export async function analyzePhoto(
       width,
       height,
       orientation,
-      dateTaken: metadata.exif ? new Date() : undefined,
+      dateTaken: exifData?.DateTimeOriginal,
       colorPalette: {
         dominant,
         vibrant: adjustColor(dominant, 20),
@@ -131,9 +137,35 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
+function extractDominantColor(pixelData: Buffer): string {
+  // Sample every 10th pixel for speed
+  let r = 0, g = 0, b = 0, count = 0;
+  
+  for (let i = 0; i < pixelData.length; i += 30) {
+    r += pixelData[i];
+    g += pixelData[i + 1];
+    b += pixelData[i + 2];
+    count++;
+  }
+  
+  return rgbToHex(
+    Math.floor(r / count),
+    Math.floor(g / count),
+    Math.floor(b / count)
+  );
+}
+
+function calculateBrightness(pixelData: Buffer): number {
+  let sum = 0;
+  for (let i = 0; i < pixelData.length; i += 3) {
+    sum += (pixelData[i] + pixelData[i + 1] + pixelData[i + 2]) / 3;
+  }
+  return (sum / (pixelData.length / 3) / 255) * 100;
+}
+
 function rgbToHex(r: number, g: number, b: number): string {
   return '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
+    const hex = Math.max(0, Math.min(255, x)).toString(16);
     return hex.length === 1 ? '0' + hex : hex;
   }).join('');
 }
