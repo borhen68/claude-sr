@@ -3,46 +3,147 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// NextAuth Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String    @unique
-  password  String?
-  image     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  projects  Project[]
-  orders    Order[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  password      String?
+  image         String?
+  role          String    @default("user")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts         Account[]
+  sessions         Session[]
+  projects         Project[]
+  orders           Order[]
+  sharedProjects   ProjectCollaborator[]
+  projectVersions  ProjectVersion[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Project {
   id           String   @id @default(cuid())
   title        String
   description  String?
-  coverImage   String?
+  coverImage   String?  @map("cover_image")
   status       String   @default("draft")
   theme        String   @default("quiet-luxe")
-  colorPalette String?
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  pages        Page[]
-  photos       Photo[]
-  orders       Order[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  colorPalette String?  @map("color_palette") @db.Text
+  isPublic     Boolean  @default(false) @map("is_public")
+  lastSavedAt  DateTime @default(now()) @map("last_saved_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  pages         Page[]
+  photos        Photo[]
+  orders        Order[]
+  versions      ProjectVersion[]
+  collaborators ProjectCollaborator[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("projects")
+}
+
+model ProjectVersion {
+  id          String   @id @default(cuid())
+  versionNum  Int      @map("version_num")
+  title       String
+  description String?
+  snapshot    String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, versionNum])
+  @@index([projectId])
+  @@map("project_versions")
+}
+
+model ProjectCollaborator {
+  id         String   @id @default(cuid())
+  role       String   @default("viewer")
+  invitedAt  DateTime @default(now()) @map("invited_at")
+  acceptedAt DateTime? @map("accepted_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@map("project_collaborators")
 }
 
 model Page {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   type      String
   order     Int
-  content   String?
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id])
+  content   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("pages")
 }
 
 model Photo {
@@ -53,23 +154,40 @@ model Photo {
   height    Int?
   theme     String?
   emotion   String?
-  colors    String?
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id])
-  createdAt DateTime @default(now())
+  colors    String?  @db.Text
+  metadata  String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("photos")
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  status    String   @default("pending")
-  amount    Float
-  currency  String   @default("USD")
-  plan      String
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  orderNumber     String   @unique @map("order_number")
+  status          String   @default("pending")
+  amount          Float
+  currency        String   @default("USD")
+  plan            String
+  shippingAddress String?  @map("shipping_address") @db.Text
+  trackingNumber  String?  @map("tracking_number")
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id])
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+  @@map("orders")
 }
 
 model Template {
@@ -77,5 +195,10 @@ model Template {
   name        String
   description String?
   thumbnail   String?
-  config      String
+  config      String  @db.Text
+  category    String  @default("general")
+  isActive    Boolean @default(true) @map("is_active")
+
+  @@index([category])
+  @@map("templates")
 }
